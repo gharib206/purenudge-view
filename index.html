@@ -18,9 +18,7 @@
             padding-bottom: 20px; 
         }
         h2 { margin-top: 0; color: var(--tg-theme-hint-color, #888); font-size: 1.2rem; text-align: center;}
-        
         .rtl { direction: rtl; }
-
         .card {
             background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
             border-radius: 12px;
@@ -31,9 +29,7 @@
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-
         label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9rem; }
-        
         input[type="text"], input[type="number"], select {
             width: 100%; padding: 12px; border-radius: 8px;
             border: 1px solid var(--tg-theme-hint-color, #ccc);
@@ -41,23 +37,49 @@
             color: var(--tg-theme-text-color, #000);
             box-sizing: border-box; font-size: 1rem; margin-bottom: 5px; outline: none;
         }
-
         input:focus, select:focus { border-color: var(--tg-theme-button-color, #3390ec); }
-
         .radio-group {
             display: flex; justify-content: space-around; margin-bottom: 15px;
             background: var(--tg-theme-bg-color); padding: 5px; border-radius: 8px;
         }
         .radio-option { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .hint { font-size: 0.8rem; color: var(--tg-theme-hint-color, #999); margin-top: -5px; margin-bottom: 15px; }
+        
+        /* استایل دکمه‌های نوع رویداد (چیپ) */
+        .type-selector { display: flex; gap: 10px; margin-bottom: 10px; }
+        .type-chip {
+            flex: 1; text-align: center; padding: 10px;
+            background: var(--tg-theme-bg-color); border: 1px solid var(--tg-theme-hint-color);
+            border-radius: 8px; cursor: pointer; transition: 0.2s;
+        }
+        .type-chip.active {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #fff);
+            border-color: var(--tg-theme-button-color, #3390ec);
+        }
+        input[type="radio"].hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <h2 id="lbl_title">Add Birthday</h2>
+    <h2 id="lbl_title">Add Event</h2>
 
     <div class="card">
-        <label id="lbl_name">Name:</label>
+        <label id="lbl_type">Event Type:</label>
+        <div class="type-selector">
+            <label class="type-chip active" id="chip_birthday">
+                <input type="radio" name="event_type" value="birthday" checked class="hidden" onchange="updateTypeUI()">
+                <span id="txt_birthday">Birthday 🎂</span>
+            </label>
+            <label class="type-chip" id="chip_anniversary">
+                <input type="radio" name="event_type" value="anniversary" class="hidden" onchange="updateTypeUI()">
+                <span id="txt_anniversary">Anniversary 💍</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="card">
+        <label id="lbl_name">Name / Title:</label>
         <input type="text" id="name" placeholder="..." />
     </div>
 
@@ -106,12 +128,11 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- دیکشنری زبان‌ها ---
         const TEXTS = {
-            en: { title: "Add Birthday", name: "Name:", calendar: "Calendar:", shamsi: "Shamsi", gregorian: "Gregorian", day: "Day", month: "Month", year: "Year (Optional)", notify: "Remind:", opt0: "Same day", opt1: "1 day before", opt3: "3 days before", opt7: "1 week before", hint: "Time: 9:00 AM", save: "Save Birthday", error: "Please enter a name!" },
-            fa: { title: "افزودن تولد", name: "نام:", calendar: "تقویم:", shamsi: "شمسی", gregorian: "میلادی", day: "روز", month: "ماه", year: "سال (اختیاری)", notify: "یادآوری:", opt0: "همان روز", opt1: "۱ روز قبل", opt3: "۳ روز قبل", opt7: "۱ هفته قبل", hint: "ساعت: ۹ صبح", save: "ذخیره تولد", error: "لطفاً نام را وارد کنید!" },
-            ar: { title: "إضافة ميلاد", name: "الاسم:", calendar: "التقويم:", shamsi: "شمسي", gregorian: "ميلادي", day: "يوم", month: "شهر", year: "سنة", notify: "تذكير:", opt0: "نفس اليوم", opt1: "قبل يوم", opt3: "قبل 3 أيام", opt7: "قبل أسبوع", hint: "ساعة: 9 ص", save: "حفظ", error: "أدخل الاسم!" },
-            ru: { title: "Добавить", name: "Имя:", calendar: "Календарь:", shamsi: "Шамси", gregorian: "Григорианский", day: "День", month: "Месяц", year: "Год", notify: "Напомнить:", opt0: "В тот же день", opt1: "За 1 день", opt3: "За 3 дня", opt7: "За неделю", hint: "Время: 9:00", save: "Сохранить", error: "Введите имя!" }
+            en: { title: "Add Event", type: "Event Type:", birthday: "Birthday 🎂", anniversary: "Anniversary 💍", name: "Name / Title:", calendar: "Calendar:", shamsi: "Shamsi", gregorian: "Gregorian", day: "Day", month: "Month", year: "Year (Optional)", notify: "Remind:", opt0: "Same day", opt1: "1 day before", opt3: "3 days before", opt7: "1 week before", hint: "Time: 9:00 AM", save: "Save Event", error: "Please enter a name!" },
+            fa: { title: "افزودن رویداد", type: "نوع رویداد:", birthday: "تولد 🎂", anniversary: "سالگرد 💍", name: "نام / عنوان:", calendar: "تقویم:", shamsi: "شمسی", gregorian: "میلادی", day: "روز", month: "ماه", year: "سال (اختیاری)", notify: "یادآوری:", opt0: "همان روز", opt1: "۱ روز قبل", opt3: "۳ روز قبل", opt7: "۱ هفته قبل", hint: "ساعت: ۹ صبح", save: "ذخیره رویداد", error: "لطفاً نام را وارد کنید!" },
+            ar: { title: "إضافة حدث", type: "نوع الحدث:", birthday: "عيد ميلاد 🎂", anniversary: "ذكرى سنوية 💍", name: "الاسم / العنوان:", calendar: "التقويم:", shamsi: "شمسي", gregorian: "ميلادي", day: "يوم", month: "شهر", year: "سنة", notify: "تذكير:", opt0: "نفس اليوم", opt1: "قبل يوم", opt3: "قبل 3 أيام", opt7: "قبل أسبوع", hint: "ساعة: 9 ص", save: "حفظ", error: "أدخل الاسم!" },
+            ru: { title: "Добавить", type: "Тип события:", birthday: "ДР 🎂", anniversary: "Годовщина 💍", name: "Имя / Название:", calendar: "Календарь:", shamsi: "Шамси", gregorian: "Григорианский", day: "День", month: "Месяц", year: "Год", notify: "Напомнить:", opt0: "В тот же день", opt1: "За 1 день", opt3: "За 3 дня", opt7: "За неделю", hint: "Время: 9:00", save: "Сохранить", error: "Введите имя!" }
         };
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -120,6 +141,9 @@
 
         function applyLanguage() {
             document.getElementById('lbl_title').innerText = t.title;
+            document.getElementById('lbl_type').innerText = t.type;
+            document.getElementById('txt_birthday').innerText = t.birthday;
+            document.getElementById('txt_anniversary').innerText = t.anniversary;
             document.getElementById('lbl_name').innerText = t.name;
             document.getElementById('lbl_calendar').innerText = t.calendar;
             document.getElementById('lbl_shamsi').innerText = t.shamsi;
@@ -138,13 +162,18 @@
                 document.body.classList.add('rtl');
                 document.querySelectorAll('input, select').forEach(el => el.style.textAlign = 'right');
             }
-            
-            // تنظیمات دکمه اصلی تلگرام
             tg.MainButton.setText(t.save);
             tg.MainButton.show();
         }
 
-        // --- تقویم و دراپ‌داون‌ها ---
+        function updateTypeUI() {
+            // تغییر استایل دکمه‌های انتخاب نوع
+            document.querySelectorAll('.type-chip').forEach(el => el.classList.remove('active'));
+            const selected = document.querySelector('input[name="event_type"]:checked');
+            selected.parentElement.classList.add('active');
+        }
+
+        // --- تقویم و سایر کدها ---
         const monthSelect = document.getElementById("month");
         const daySelect = document.getElementById("day");
         const monthsShamsi = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
@@ -199,21 +228,18 @@
 
         monthSelect.addEventListener("change", updateDays);
 
-        // --- تابع ذخیره ---
         function saveData() {
             const name = document.getElementById("name").value;
             const yearVal = document.getElementById("year").value;
             
-            // اعتبارسنجی
             if (!name || name.trim() === "") {
-                tg.showPopup({title: 'Error', message: t.error}); // نمایش خطای شیک تلگرام
+                tg.showPopup({title: 'Error', message: t.error});
                 return;
             }
-
-            // نمایش لودینگ روی دکمه
             tg.MainButton.showProgress(true);
 
             const data = {
+                event_type: document.querySelector('input[name="event_type"]:checked').value, // داده جدید
                 name: name,
                 calendar: document.querySelector('input[name="calendar"]:checked').value,
                 day: parseInt(daySelect.value),
@@ -221,12 +247,9 @@
                 year: yearVal ? parseInt(yearVal) : null,
                 notify: parseInt(document.getElementById("notify").value)
             };
-
-            // ارسال داده به تلگرام
             tg.sendData(JSON.stringify(data));
         }
 
-        // اتصال دکمه اصلی تلگرام به تابع ما
         Telegram.WebApp.onEvent('mainButtonClicked', saveData);
 
         applyLanguage();
