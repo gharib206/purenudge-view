@@ -15,10 +15,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 80px; /* فضا برای دکمه پایین */
         }
         h2 { margin-top: 0; color: var(--tg-theme-hint-color, #888); font-size: 1.2rem; text-align: center;}
         
-        /* جهت راست‌چین برای فارسی و عربی */
         .rtl { direction: rtl; }
 
         .card {
@@ -50,6 +50,21 @@
         }
         .radio-option { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .hint { font-size: 0.8rem; color: var(--tg-theme-hint-color, #999); margin-top: -5px; margin-bottom: 15px; }
+
+        /* دکمه دستی برای اطمینان */
+        .manual-btn {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            width: 100%;
+            max-width: 350px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -58,7 +73,7 @@
 
     <div class="card">
         <label id="lbl_name">Name:</label>
-        <input type="text" id="name" />
+        <input type="text" id="name" placeholder="..." />
     </div>
 
     <div class="card">
@@ -102,84 +117,18 @@
         <p class="hint" id="lbl_time_hint">We will notify you at 9:00 AM.</p>
     </div>
 
+    <button class="manual-btn" onclick="saveData()" id="btn_manual">Save Birthday</button>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
         // --- دیکشنری زبان‌ها ---
         const TEXTS = {
-            en: {
-                title: "Add Birthday",
-                name: "Name of person:",
-                calendar: "Calendar Type:",
-                shamsi: "Shamsi (Jalali)",
-                gregorian: "Gregorian",
-                day: "Day",
-                month: "Month",
-                year: "Year (Optional)",
-                notify: "Remind me:",
-                opt0: "On the exact day",
-                opt1: "1 day before",
-                opt3: "3 days before",
-                opt7: "1 week before",
-                hint: "Notification time: 9:00 AM",
-                save: "Save Birthday",
-                error: "Please enter a name."
-            },
-            fa: {
-                title: "افزودن تولد",
-                name: "نام شخص:",
-                calendar: "نوع تقویم:",
-                shamsi: "شمسی",
-                gregorian: "میلادی",
-                day: "روز",
-                month: "ماه",
-                year: "سال (اختیاری)",
-                notify: "زمان یادآوری:",
-                opt0: "همان روز",
-                opt1: "۱ روز قبل",
-                opt3: "۳ روز قبل",
-                opt7: "۱ هفته قبل",
-                hint: "ساعت ارسال پیام: ۹ صبح",
-                save: "ذخیره تولد",
-                error: "لطفاً نام را وارد کنید."
-            },
-            ar: {
-                title: "إضافة عيد ميلاد",
-                name: "الاسم:",
-                calendar: "نوع التقويم:",
-                shamsi: "شمسي (هجري شمسي)",
-                gregorian: "ميلادي",
-                day: "اليوم",
-                month: "الشهر",
-                year: "السنة (اختياري)",
-                notify: "تذكير:",
-                opt0: "في نفس اليوم",
-                opt1: "قبل يوم واحد",
-                opt3: "قبل 3 أيام",
-                opt7: "قبل أسبوع",
-                hint: "وقت التنبيه: 9:00 صباحاً",
-                save: "حفظ",
-                error: "الرجاء إدخال الاسم."
-            },
-            ru: {
-                title: "Добавить ДР",
-                name: "Имя:",
-                calendar: "Календарь:",
-                shamsi: "Шамси (Иранский)",
-                gregorian: "Григорианский",
-                day: "День",
-                month: "Месяц",
-                year: "Год (необязательно)",
-                notify: "Напомнить:",
-                opt0: "В тот же день",
-                opt1: "За 1 день",
-                opt3: "За 3 дня",
-                opt7: "За неделю",
-                hint: "Время уведомления: 9:00",
-                save: "Сохранить",
-                error: "Пожалуйста, введите имя."
-            }
+            en: { title: "Add Birthday", name: "Name:", calendar: "Calendar:", shamsi: "Shamsi", gregorian: "Gregorian", day: "Day", month: "Month", year: "Year (Optional)", notify: "Remind:", opt0: "Same day", opt1: "1 day before", opt3: "3 days before", opt7: "1 week before", hint: "Time: 9:00 AM", save: "Save Birthday", error: "Enter a name!" },
+            fa: { title: "افزودن تولد", name: "نام:", calendar: "تقویم:", shamsi: "شمسی", gregorian: "میلادی", day: "روز", month: "ماه", year: "سال (اختیاری)", notify: "یادآوری:", opt0: "همان روز", opt1: "۱ روز قبل", opt3: "۳ روز قبل", opt7: "۱ هفته قبل", hint: "ساعت: ۹ صبح", save: "ذخیره تولد", error: "نام را وارد کنید!" },
+            ar: { title: "إضافة ميلاد", name: "الاسم:", calendar: "التقويم:", shamsi: "شمسي", gregorian: "ميلادي", day: "يوم", month: "شهر", year: "سنة", notify: "تذكير:", opt0: "نفس اليوم", opt1: "قبل يوم", opt3: "قبل 3 أيام", opt7: "قبل أسبوع", hint: "ساعة: 9 ص", save: "حفظ", error: "أدخل الاسم!" },
+            ru: { title: "Добавить", name: "Имя:", calendar: "Календарь:", shamsi: "Шамси", gregorian: "Григорианский", day: "День", month: "Месяц", year: "Год", notify: "Напомнить:", opt0: "В тот же день", opt1: "За 1 день", opt3: "За 3 дня", opt7: "За неделю", hint: "Время: 9:00", save: "Сохранить", error: "Введите имя!" }
         };
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -201,26 +150,25 @@
             document.getElementById('opt_3').innerText = t.opt3;
             document.getElementById('opt_7').innerText = t.opt7;
             document.getElementById('lbl_time_hint').innerText = t.hint;
+            document.getElementById('btn_manual').innerText = t.save;
 
             if (userLang === 'fa' || userLang === 'ar') {
                 document.body.classList.add('rtl');
                 document.querySelectorAll('input, select').forEach(el => el.style.textAlign = 'right');
             }
-
             tg.MainButton.setText(t.save);
             tg.MainButton.show();
         }
 
+        // --- تقویم و دراپ‌داون‌ها ---
         const monthSelect = document.getElementById("month");
         const daySelect = document.getElementById("day");
-        
         const monthsShamsi = ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور", "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"];
         const monthsGregorian = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         function handleCalendarChange() {
             const isShamsi = document.querySelector('input[name="calendar"]:checked').value === 'shamsi';
             const yearInput = document.getElementById('year');
-            
             if (isShamsi) {
                 yearInput.placeholder = "13xx";
                 updateDropdowns(monthsShamsi);
@@ -232,8 +180,6 @@
 
         function updateDropdowns(monthsList) {
             const currentMonthIdx = monthSelect.selectedIndex >= 0 ? monthSelect.selectedIndex : 0;
-            const currentDay = daySelect.value;
-
             monthSelect.innerHTML = "";
             monthsList.forEach((m, index) => {
                 let option = document.createElement("option");
@@ -242,7 +188,6 @@
                 monthSelect.appendChild(option);
             });
             monthSelect.selectedIndex = currentMonthIdx;
-
             updateDays();
         }
 
@@ -250,7 +195,6 @@
             const isShamsi = document.querySelector('input[name="calendar"]:checked').value === 'shamsi';
             const selectedMonth = parseInt(monthSelect.value);
             let maxDays = 31;
-
             if (isShamsi) {
                 if (selectedMonth > 6 && selectedMonth < 12) maxDays = 30;
                 if (selectedMonth === 12) maxDays = 29; 
@@ -258,7 +202,6 @@
                 if ([4, 6, 9, 11].includes(selectedMonth)) maxDays = 30;
                 if (selectedMonth === 2) maxDays = 29;
             }
-
             const currentDay = daySelect.value;
             daySelect.innerHTML = "";
             for (let i = 1; i <= maxDays; i++) {
@@ -272,30 +215,42 @@
 
         monthSelect.addEventListener("change", updateDays);
 
-        Telegram.WebApp.onEvent('mainButtonClicked', function(){
-            const name = document.getElementById("name").value;
-            const yearVal = document.getElementById("year").value;
-            
-            if (!name) {
-                tg.showPopup({title: "Error", message: t.error});
-                return;
+        // --- تابع اصلی ذخیره ---
+        function saveData() {
+            try {
+                const name = document.getElementById("name").value;
+                const yearVal = document.getElementById("year").value;
+                
+                if (!name || name.trim() === "") {
+                    alert(t.error); // نمایش خطا به کاربر روی گوشی
+                    return;
+                }
+
+                const data = {
+                    name: name,
+                    calendar: document.querySelector('input[name="calendar"]:checked').value,
+                    day: parseInt(daySelect.value),
+                    month: parseInt(monthSelect.value),
+                    year: yearVal ? parseInt(yearVal) : null,
+                    notify: parseInt(document.getElementById("notify").value)
+                };
+
+                // ارسال داده به تلگرام
+                tg.sendData(JSON.stringify(data));
+                
+                // بستن دستی اپ برای اطمینان
+                setTimeout(() => { tg.close(); }, 100);
+
+            } catch (e) {
+                alert("JS Error: " + e.message);
             }
+        }
 
-            const data = {
-                name: name,
-                calendar: document.querySelector('input[name="calendar"]:checked').value,
-                day: parseInt(daySelect.value),
-                month: parseInt(monthSelect.value),
-                year: yearVal ? parseInt(yearVal) : null,
-                notify: parseInt(document.getElementById("notify").value)
-            };
-
-            tg.sendData(JSON.stringify(data));
-        });
+        // اتصال دکمه اصلی تلگرام به تابع ما
+        Telegram.WebApp.onEvent('mainButtonClicked', saveData);
 
         applyLanguage();
         handleCalendarChange(); 
-
     </script>
 </body>
 </html>
