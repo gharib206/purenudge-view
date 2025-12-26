@@ -15,7 +15,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 80px; /* فضا برای دکمه پایین */
+            padding-bottom: 20px; 
         }
         h2 { margin-top: 0; color: var(--tg-theme-hint-color, #888); font-size: 1.2rem; text-align: center;}
         
@@ -50,21 +50,6 @@
         }
         .radio-option { display: flex; align-items: center; gap: 5px; cursor: pointer; }
         .hint { font-size: 0.8rem; color: var(--tg-theme-hint-color, #999); margin-top: -5px; margin-bottom: 15px; }
-
-        /* دکمه دستی برای اطمینان */
-        .manual-btn {
-            background-color: var(--tg-theme-button-color, #3390ec);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            width: 100%;
-            max-width: 350px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-        }
     </style>
 </head>
 <body>
@@ -117,16 +102,14 @@
         <p class="hint" id="lbl_time_hint">We will notify you at 9:00 AM.</p>
     </div>
 
-    <button class="manual-btn" onclick="saveData()" id="btn_manual">Save Birthday</button>
-
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
         // --- دیکشنری زبان‌ها ---
         const TEXTS = {
-            en: { title: "Add Birthday", name: "Name:", calendar: "Calendar:", shamsi: "Shamsi", gregorian: "Gregorian", day: "Day", month: "Month", year: "Year (Optional)", notify: "Remind:", opt0: "Same day", opt1: "1 day before", opt3: "3 days before", opt7: "1 week before", hint: "Time: 9:00 AM", save: "Save Birthday", error: "Enter a name!" },
-            fa: { title: "افزودن تولد", name: "نام:", calendar: "تقویم:", shamsi: "شمسی", gregorian: "میلادی", day: "روز", month: "ماه", year: "سال (اختیاری)", notify: "یادآوری:", opt0: "همان روز", opt1: "۱ روز قبل", opt3: "۳ روز قبل", opt7: "۱ هفته قبل", hint: "ساعت: ۹ صبح", save: "ذخیره تولد", error: "نام را وارد کنید!" },
+            en: { title: "Add Birthday", name: "Name:", calendar: "Calendar:", shamsi: "Shamsi", gregorian: "Gregorian", day: "Day", month: "Month", year: "Year (Optional)", notify: "Remind:", opt0: "Same day", opt1: "1 day before", opt3: "3 days before", opt7: "1 week before", hint: "Time: 9:00 AM", save: "Save Birthday", error: "Please enter a name!" },
+            fa: { title: "افزودن تولد", name: "نام:", calendar: "تقویم:", shamsi: "شمسی", gregorian: "میلادی", day: "روز", month: "ماه", year: "سال (اختیاری)", notify: "یادآوری:", opt0: "همان روز", opt1: "۱ روز قبل", opt3: "۳ روز قبل", opt7: "۱ هفته قبل", hint: "ساعت: ۹ صبح", save: "ذخیره تولد", error: "لطفاً نام را وارد کنید!" },
             ar: { title: "إضافة ميلاد", name: "الاسم:", calendar: "التقويم:", shamsi: "شمسي", gregorian: "ميلادي", day: "يوم", month: "شهر", year: "سنة", notify: "تذكير:", opt0: "نفس اليوم", opt1: "قبل يوم", opt3: "قبل 3 أيام", opt7: "قبل أسبوع", hint: "ساعة: 9 ص", save: "حفظ", error: "أدخل الاسم!" },
             ru: { title: "Добавить", name: "Имя:", calendar: "Календарь:", shamsi: "Шамси", gregorian: "Григорианский", day: "День", month: "Месяц", year: "Год", notify: "Напомнить:", opt0: "В тот же день", opt1: "За 1 день", opt3: "За 3 дня", opt7: "За неделю", hint: "Время: 9:00", save: "Сохранить", error: "Введите имя!" }
         };
@@ -150,12 +133,13 @@
             document.getElementById('opt_3').innerText = t.opt3;
             document.getElementById('opt_7').innerText = t.opt7;
             document.getElementById('lbl_time_hint').innerText = t.hint;
-            document.getElementById('btn_manual').innerText = t.save;
 
             if (userLang === 'fa' || userLang === 'ar') {
                 document.body.classList.add('rtl');
                 document.querySelectorAll('input, select').forEach(el => el.style.textAlign = 'right');
             }
+            
+            // تنظیمات دکمه اصلی تلگرام
             tg.MainButton.setText(t.save);
             tg.MainButton.show();
         }
@@ -215,35 +199,31 @@
 
         monthSelect.addEventListener("change", updateDays);
 
-        // --- تابع اصلی ذخیره ---
+        // --- تابع ذخیره ---
         function saveData() {
-            try {
-                const name = document.getElementById("name").value;
-                const yearVal = document.getElementById("year").value;
-                
-                if (!name || name.trim() === "") {
-                    alert(t.error); // نمایش خطا به کاربر روی گوشی
-                    return;
-                }
-
-                const data = {
-                    name: name,
-                    calendar: document.querySelector('input[name="calendar"]:checked').value,
-                    day: parseInt(daySelect.value),
-                    month: parseInt(monthSelect.value),
-                    year: yearVal ? parseInt(yearVal) : null,
-                    notify: parseInt(document.getElementById("notify").value)
-                };
-
-                // ارسال داده به تلگرام
-                tg.sendData(JSON.stringify(data));
-                
-                // بستن دستی اپ برای اطمینان
-                setTimeout(() => { tg.close(); }, 100);
-
-            } catch (e) {
-                alert("JS Error: " + e.message);
+            const name = document.getElementById("name").value;
+            const yearVal = document.getElementById("year").value;
+            
+            // اعتبارسنجی
+            if (!name || name.trim() === "") {
+                tg.showPopup({title: 'Error', message: t.error}); // نمایش خطای شیک تلگرام
+                return;
             }
+
+            // نمایش لودینگ روی دکمه
+            tg.MainButton.showProgress(true);
+
+            const data = {
+                name: name,
+                calendar: document.querySelector('input[name="calendar"]:checked').value,
+                day: parseInt(daySelect.value),
+                month: parseInt(monthSelect.value),
+                year: yearVal ? parseInt(yearVal) : null,
+                notify: parseInt(document.getElementById("notify").value)
+            };
+
+            // ارسال داده به تلگرام
+            tg.sendData(JSON.stringify(data));
         }
 
         // اتصال دکمه اصلی تلگرام به تابع ما
